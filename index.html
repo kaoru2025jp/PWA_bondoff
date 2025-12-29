@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOS Excel風表示（PWA版）</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+  table {
+    border-collapse: collapse;
+    width: 420px;
+    margin-top: 10px;
+  }
+  th, td {
+    border: 1px solid #999;
+    padding: 8px;
+    text-align: center;
+  }
+  th {
+    background-color: #4CAF50;
+    color: white;
+  }
+  .sub th {
+    background-color: #607d8b;
+  }
+  button {
+    margin-top: 10px;
+    padding: 6px 12px;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>SOS 変動率・インフレ表示</h2>
+
+<button type="button" onclick="startCalc()">START</button>
+<div id="result"></div>
+<div id="rate"></div>
+
+<script>
+let S1, S2, S3, S4, O1, O2, K1, K2;
+
+function startCalc() {
+  S1 = Number(prompt("S1"));
+  S2 = Number(prompt("S2"));
+  S3 = Number(prompt("S3"));
+  S4 = Number(prompt("S4"));
+  O1 = Number(prompt("O1"));
+  O2 = Number(prompt("O2"));
+  K1 = Number(prompt("K1"));
+  K2 = Number(prompt("K2"));
+
+  const T1 = (S1 - S2) / S2;
+  const T2 = (S1 - S3) / S3;
+  const T3 = (S2 - S4) / S4;
+  const T4 = (S3 - S4) / S4;
+  const T5 = (S2 - S3) / O1;
+  const T6 = (S2 - S3) / O2;
+  const SX = (O1 - O2) / (1 - K1 * K2);
+
+  document.getElementById("result").innerHTML = `
+    <table>
+      <tr><th>項目</th><th>計算結果</th></tr>
+      <tr><td>T1 = (S1 - S2) / S2</td><td>${T1.toFixed(4)}</td></tr>
+      <tr><td>T2 = (S1 - S3) / S3</td><td>${T2.toFixed(4)}</td></tr>
+      <tr><td>T3 = (S2 - S4) / S4</td><td>${T3.toFixed(4)}</td></tr>
+      <tr><td>T4 = (S3 - S4) / S4</td><td>${T4.toFixed(4)}</td></tr>
+      <tr><td>T5 = (S2 - S3) / O1</td><td>${T5.toFixed(4)}</td></tr>
+      <tr><td>T6 = (S2 - S3) / O2</td><td>${T6.toFixed(4)}</td></tr>
+      <tr><td>SX</td><td>${SX.toFixed(4)}</td></tr>
+    </table>
+    <button onclick="checkRate()">変動率チェック</button>
+  `;
+}
+
+function checkRate() {
+  const P1 = (S1 - S2) / S1;
+  const P2 = (S1 - S3) / S1;
+  const P3 = (S2 - S4) / S2;
+  const P4 = (S3 - S4) / S3;
+
+  document.getElementById("rate").innerHTML = `
+    <table class="sub">
+      <tr><th>変動率</th><th>値</th></tr>
+      <tr><td>P1</td><td>${P1.toFixed(4)}</td></tr>
+      <tr><td>P2</td><td>${P2.toFixed(4)}</td></tr>
+      <tr><td>P3</td><td>${P3.toFixed(4)}</td></tr>
+      <tr><td>P4</td><td>${P4.toFixed(4)}</td></tr>
+    </table>
+  `;
+}
+
+// Service Worker 登録
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+
+</body>
+</html>
